@@ -1,11 +1,22 @@
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using WebAPI;
+using WebAPI.Data;
 using WebAPI.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 //Log.Logger = new    LoggerConfiguration().MinimumLevel.Debug().WriteTo.File("log/villaLogs.txt", rollingInterval:RollingInterval.Minute).CreateLogger();
-// Add services to the container.
+
 //builder.Host.UseSerilog();
-builder.Services.AddControllers(options => options.ReturnHttpNotAcceptable = true).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
+builder.Services.AddDbContext<ApplicationDBContext>(option => {
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
+    });
+
+builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddControllers().AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+//builder.Services.AddControllers(options => options.ReturnHttpNotAcceptable = true).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
 //builder.Services.AddSingleton<ILogging, Logging>();   
 
 builder.Services.AddEndpointsApiExplorer();
